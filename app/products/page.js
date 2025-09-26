@@ -10,6 +10,8 @@ export const metadata = {
   description: 'Browse all products in our clothing store',
 }
 
+export const revalidate = 0
+
 export default async function ProductsPage({ searchParams }) {
   const page = parseInt(searchParams.page) || 1
   const q = searchParams.q || ''

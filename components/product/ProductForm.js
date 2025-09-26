@@ -29,11 +29,24 @@ export default function ProductForm({
   const [loading, setLoading] = useState(false)
   const { addToast } = useToast()
 
+  const isValidUrl = (value) => {
+    if (!value) return true
+    try {
+      const url = new URL(value)
+      return url.protocol === 'http:' || url.protocol === 'https:'
+    } catch {
+      return false
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setLoading(true)
     
     try {
+      if (form.imageUrl && !isValidUrl(form.imageUrl)) {
+        throw new Error('Image URL must be a valid http/https link')
+      }
       let res
       if (file) {
         const fd = new FormData()
@@ -44,6 +57,9 @@ export default function ProductForm({
         fd.append('gender', form.gender)
         fd.append('season', form.season)
         fd.append('image', file)
+        if (form.imageUrl) {
+          fd.append('imageUrl', form.imageUrl)
+        }
         res = await fetch(action, { method, body: fd })
       } else {
         res = await fetch(action, {

@@ -11,6 +11,16 @@ function toBoolean(value) {
   return value === 'true' || value === true;
 }
 
+function isValidHttpUrl(value) {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(request) {
   await dbConnect();
 
@@ -98,6 +108,10 @@ export async function POST(request) {
 
       let imageUrl = formData.get('imageUrl') || '';
 
+      if (imageUrl && !isValidHttpUrl(imageUrl)) {
+        return Response.json({ success: false, error: 'Image URL must be a valid http/https link' }, { status: 400 });
+      }
+
       if (imageFile && imageFile instanceof File) {
         if (!isCloudinaryConfigured()) {
           return Response.json({
@@ -131,6 +145,9 @@ export async function POST(request) {
     
     if (!name || !description || typeof price !== 'number' || !category || !gender || !season) {
       return Response.json({ success: false, error: 'Missing required fields' }, { status: 400 });
+    }
+    if (image && !isValidHttpUrl(image)) {
+      return Response.json({ success: false, error: 'Image URL must be a valid http/https link' }, { status: 400 });
     }
     
     const created = await Product.create({ name, description, price, category, gender, season, image });

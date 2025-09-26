@@ -7,6 +7,16 @@ import { promises as fs } from 'fs';
 // export const config đã deprecated trong App Router
 // Sử dụng request.formData() để xử lý multipart form data
 
+function isValidHttpUrl(value) {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(request, { params }) {
   await dbConnect();
 
@@ -47,6 +57,10 @@ export async function PUT(request, { params }) {
 
       let imageUrl = formData.get('imageUrl') || '';
 
+      if (imageUrl && !isValidHttpUrl(imageUrl)) {
+        return Response.json({ success: false, error: 'Image URL must be a valid http/https link' }, { status: 400 });
+      }
+
       if (imageFile && imageFile instanceof File) {
         if (!isCloudinaryConfigured()) {
           return Response.json({
@@ -81,6 +95,9 @@ export async function PUT(request, { params }) {
     if (!name || !description || typeof price !== 'number' || !category || !gender || !season) {
       return Response.json({ success: false, error: 'Missing required fields' }, { status: 400 });
     }
+  if (image && !isValidHttpUrl(image)) {
+    return Response.json({ success: false, error: 'Image URL must be a valid http/https link' }, { status: 400 });
+  }
     
     const updated = await Product.findByIdAndUpdate(
       params.id,
