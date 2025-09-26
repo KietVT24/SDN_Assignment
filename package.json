@@ -1,13 +1,37 @@
 {
   "name": "clothing-store",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "Clothing store CRUD app with Next.js + MongoDB",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seed": "node scripts/seed.js",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module"
+  "dependencies": {
+    "axios": "^1.7.7",
+    "class-variance-authority": "^0.7.1",
+    "cloudinary": "^2.5.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^16.4.5",
+    "formidable": "^3.5.0",
+    "lucide-react": "^0.544.0",
+    "mongoose": "^8.6.1",
+    "next": "^14.2.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.6",
+    "postcss": "^8.5.6",
+    "prettier": "^3.3.3",
+    "tailwindcss": "^3.4.17"
+  }
 }
