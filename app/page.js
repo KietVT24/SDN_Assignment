@@ -14,9 +14,7 @@ export default async function HomePage({ searchParams }) {
   
   let productsData
   try {
-    console.log('Fetching products with params:', { page, q, category, gender, season, limit: 20 })
     productsData = await fetchProducts({ page, q, category, gender, season, limit: 20 })
-    console.log('Products data received:', productsData)
   } catch (error) {
     console.error('Error fetching products:', error)
     productsData = { items: [], page: 1, limit: 20, total: 0, totalPages: 1 }
@@ -226,8 +224,7 @@ function Pagination({ currentPage, totalPages, searchQuery, category, gender, se
         variant="outline"
         disabled={currentPage === 1}
       >
-        <Link href={createPageUrl(prevPage)}>
-          {/* <ChevronLeft className="h-4 w-4 mr-2" /> */}
+        <Link href={createPageUrl(prevPage)} className="inline-flex items-center">
           Previous
         </Link>
       </Button>
@@ -257,7 +254,7 @@ function Pagination({ currentPage, totalPages, searchQuery, category, gender, se
         variant="outline"
         disabled={currentPage === totalPages}
       >
-        <Link href={createPageUrl(nextPage)}>
+        <Link href={createPageUrl(nextPage)} className="inline-flex items-center">
           Next
           {/* <ChevronRight className="h-4 w-4 ml-2" /> */}
         </Link>

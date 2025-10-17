@@ -19,7 +19,7 @@ export default async function ProductDetailPage({ params }) {
     <div className="container mx-auto px-4 py-8">
       {/* Back Button */}
       <Button asChild variant="ghost" className="mb-6">
-        <Link href="/">
+        <Link href="/" className="inline-flex items-center" >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Products
         </Link>
@@ -114,7 +114,7 @@ export default async function ProductDetailPage({ params }) {
           {/* Action Buttons */}
           <div className="flex gap-4">
             <Button asChild className="flex-1">
-              <Link href={`/products/edit/${product._id}`}>
+              <Link href={`/products/edit/${product._id}`} className="inline-flex items-center">
                 <Edit className="h-4 w-4 mr-2" />
                 Edit Product
               </Link>

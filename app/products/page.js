@@ -18,15 +18,13 @@ export default async function ProductsPage({ searchParams }) {
   
   let productsData
   try {
-    console.log('Products page - Fetching with params:', { page, q })
     productsData = await fetchProducts({ page, q })
-    console.log('Products page - Data received:', productsData)
   } catch (error) {
     console.error('Products page - Error fetching:', error)
     productsData = { items: [], page: 1, limit: 12, total: 0, totalPages: 1 }
   }
 
-  const { items: products, page: currentPage, totalPages } = productsData
+  const { items: products, page: currentPage, totalPages, limit, total } = productsData
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -38,19 +36,13 @@ export default async function ProductsPage({ searchParams }) {
             {q ? `Search results for "${q}"` : 'Browse our complete collection'}
           </p>
         </div>
-        {/* <Button asChild>
-          <Link href="/products/new">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Product
-          </Link>
-        </Button> */}
       </div>
 
-      {/* Results Count */}
+      {/* Results Count - FIXED */}
       {products.length > 0 && (
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">
-            Showing {products.length} of {productsData.total} products
+            Showing {((currentPage - 1) * limit) + 1}-{Math.min(currentPage * limit, total)} of {total} products
           </p>
         </div>
       )}
@@ -119,6 +111,36 @@ function Pagination({ currentPage, totalPages, searchQuery }) {
     return `/products?${params.toString()}`
   }
 
+  // FIXED: Tính toán đúng range của page numbers
+  const getPageNumbers = () => {
+    const maxVisible = 5
+    const pages = []
+    
+    if (totalPages <= maxVisible) {
+      // Hiển thị tất cả nếu ít hơn hoặc bằng 5 trang
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      // Logic hiển thị khi có nhiều hơn 5 trang
+      let startPage = Math.max(1, currentPage - 2)
+      let endPage = Math.min(totalPages, startPage + maxVisible - 1)
+      
+      // Điều chỉnh startPage nếu endPage đã chạm totalPages
+      if (endPage === totalPages) {
+        startPage = Math.max(1, endPage - maxVisible + 1)
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i)
+      }
+    }
+    
+    return pages
+  }
+
+  const pageNumbers = getPageNumbers()
+
   return (
     <div className="flex items-center justify-center space-x-2">
       <Button
@@ -126,30 +148,25 @@ function Pagination({ currentPage, totalPages, searchQuery }) {
         variant="outline"
         disabled={currentPage === 1}
       >
-        <Link href={createPageUrl(prevPage)}>
+        <Link href={createPageUrl(prevPage)} className="inline-flex items-center" >
           <ChevronLeft className="h-4 w-4 mr-2" />
           Previous
         </Link>
       </Button>
 
       <div className="flex items-center space-x-1">
-        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-          const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i
-          if (pageNum > totalPages) return null
-          
-          return (
-            <Button
-              key={pageNum}
-              asChild
-              variant={pageNum === currentPage ? "default" : "outline"}
-              size="sm"
-            >
-              <Link href={createPageUrl(pageNum)}>
-                {pageNum}
-              </Link>
-            </Button>
-          )
-        })}
+        {pageNumbers.map((pageNum) => (
+          <Button
+            key={pageNum}
+            asChild
+            variant={pageNum === currentPage ? "default" : "outline"}
+            size="sm"
+          >
+            <Link href={createPageUrl(pageNum)}>
+              {pageNum}
+            </Link>
+          </Button>
+        ))}
       </div>
 
       <Button
@@ -157,7 +174,7 @@ function Pagination({ currentPage, totalPages, searchQuery }) {
         variant="outline"
         disabled={currentPage === totalPages}
       >
-        <Link href={createPageUrl(nextPage)}>
+        <Link href={createPageUrl(nextPage)} className="inline-flex items-center" >
           Next
           <ChevronRight className="h-4 w-4 ml-2" />
         </Link>
