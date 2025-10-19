@@ -139,16 +139,16 @@ export default function PaymentSuccessPage() {
                   </h3>
                   <ul className="space-y-2 text-sm text-blue-800">
                     <li className="flex items-start">
-                      <span className="bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">1</span>
-                      <span>We'll send you an order confirmation email shortly</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">2</span>
-                      <span>Your order will be processed and prepared for shipping</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">3</span>
-                      <span>You'll receive tracking information once your order ships</span>
+                        <span className="bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">1</span>
+                        <span>We&apos;ll send you an order confirmation email shortly</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">2</span>
+                        <span>Your order will be processed and prepared for shipping</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">3</span>
+                        <span>You&apos;ll receive tracking information once your order ships</span>
                     </li>
                     <li className="flex items-start">
                       <span className="bg-blue-200 rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">4</span>
