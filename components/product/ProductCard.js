@@ -1,98 +1,258 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { Card, CardContent, CardFooter } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { Eye, Edit, Trash2 } from 'lucide-react'
+'use client';
 
-export default function ProductCard({ product, showActions = false, onEdit, onDelete }) {
+import Link from 'next/link';
+import Image from 'next/image';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { Edit, Trash2, ShoppingCart } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+
+export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
+  const { data: session } = useSession();
+  const router = useRouter();
+  const [adding, setAdding] = useState(false);
+
+  const isOwner = session?.user?.id === product.createdBy;
+
+  const formatNumber = (value, locale = 'en-US') => {
+    if (value == null || value === '') return '0';
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    if (Number.isNaN(num)) return '0';
+    return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(num);
+  };
+
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+
+    if (!session) {
+      toast.error('Please login to add items to cart');
+      router.push('/auth/login?callbackUrl=/products');
+      return;
+    }
+
+    try {
+      setAdding(true);
+      const res = await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: product._id,
+          quantity: 1
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success('Added to cart!');
+      } else {
+        toast.error(data.error || 'Failed to add to cart');
+      }
+    } catch (error) {
+      console.error('Add to cart error:', error);
+      toast.error('Failed to add to cart');
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleDelete = (e) => {
+    e.preventDefault();
+    if (onDelete) {
+      onDelete(product._id);
+    }
+  };
+
+  // List View
+  if (viewMode === 'list') {
+    return (
+      <Link href={`/products/${product._id}`}>
+        <div className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 flex">
+          {/* Product Image */}
+          <div className="relative w-48 h-48 flex-shrink-0 bg-gray-100">
+            {product.image ? (
+              <Image
+                src={product.image}
+                alt={product.name || 'Product image'}
+                fill
+                className="object-contain"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+            )}
+          </div>
+
+          {/* Product Info */}
+          <div className="flex-1 p-6 flex flex-col justify-between">
+            <div>
+              <div className="flex items-start justify-between mb-2">
+                <h3 className="font-semibold text-xl text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  {product.name}
+                </h3>
+                <span className="text-2xl font-bold text-indigo-600">
+                  {formatNumber(product.price)}
+                </span>
+              </div>
+
+              <p className="text-gray-600 mb-4 line-clamp-2">
+                {product.description}
+              </p>
+
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {product.category && (
+                  <span className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full">
+                    {product.category}
+                  </span>
+                )}
+                {product.gender && (
+                  <span className="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded-full">
+                    {product.gender}
+                  </span>
+                )}
+                {product.season && (
+                  <span className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full">
+                    {product.season}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2">
+              <Button
+                onClick={handleAddToCart}
+                disabled={adding}
+                className="flex-1"
+                aria-label="Add to cart"
+              >
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                {adding ? 'Adding...' : 'Add to Cart'}
+              </Button>
+
+              {session && isOwner && (
+                <>
+                  <Link href={`/products/edit/${product._id}`} onClick={(e) => e.stopPropagation()}>
+                    <Button variant="outline">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    onClick={handleDelete}
+                    className="text-red-600 hover:bg-red-50"
+                    aria-label="Delete product"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
+  // Grid View (default) - Optimized for compact cards
   return (
-    <Card className="group overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 shadow-md">
-      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-muted/50 to-muted">
-        {product.image ? (
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-cover transition-all duration-300 group-hover:scale-110"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-            <span className="text-muted-foreground text-lg">📷</span>
-          </div>
-        )}
-        
-        {/* Overlay gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        
-        {/* Category badge */}
-        <div className="absolute top-3 left-3">
-          <span className="text-xs font-medium bg-white/90 backdrop-blur-sm text-primary px-2 py-1 rounded-full shadow-sm">
-            {product.category}
-          </span>
-        </div>
-      </div>
-      
-      <CardContent className="p-5">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-medium text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
-            {product.gender}
-          </span>
-          <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
-            {product.season}
-          </span>
-        </div>
-        
-        <h3 className="font-bold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-          {product.name}
-        </h3>
-        <p className="text-muted-foreground text-sm mb-4 line-clamp-2 leading-relaxed">
-          {product.description}
-        </p>
-        
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-primary">
-            {product.price?.toLocaleString('vi-VN')}₫
-          </span>
-          <div className="text-xs text-muted-foreground">
-            <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1"></span>
-            Còn hàng
-          </div>
-        </div>
-      </CardContent>
+    <Link href={`/products/${product._id}`}>
+      <div className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 h-full flex flex-col">
+        {/* Product Image Container */}
+        <div className="relative w-full aspect-square bg-gray-100 overflow-hidden flex-shrink-0">
+          {product.image ? (
+            <Image
+              src={product.image}
+              alt={product.name || 'Product image'}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50">
+              <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+          )}
 
-      <CardFooter className="p-5 pt-0">
-        <div className="flex w-full gap-2">
-          <Button asChild variant="outline" size="sm" className="flex-1 hover:bg-primary hover:text-primary-foreground transition-colors">
-            <Link href={`/products/${product._id}`}>
-              {/* <Eye className="h-4 w-4 mr-2" /> */}
-              Xem chi tiết
-            </Link>
-          </Button>
-          
-          {showActions && (
-            <>
+          {/* Top Action Buttons */}
+          {session && isOwner && (
+            <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <Link href={`/products/edit/${product._id}`} onClick={(e) => e.stopPropagation()}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="bg-white shadow-md hover:bg-gray-50 rounded-md"
+                  aria-label="Edit product"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </Link>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
-                onClick={() => onEdit?.(product)}
-                className="flex-1 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"
+                onClick={handleDelete}
+                className="bg-white shadow-md hover:bg-red-50 hover:text-red-600 rounded-md"
+                aria-label="Delete product"
               >
-                <Edit className="h-4 w-4 mr-2" />
-                Sửa
+                <Trash2 className="h-4 w-4" />
               </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => onDelete?.(product)}
-                className="flex-1 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Xóa
-              </Button>
-            </>
+            </div>
           )}
         </div>
-      </CardFooter>
-    </Card>
-  )
+
+        {/* Product Info */}
+        <div className="p-3 flex-1 flex flex-col">
+          {/* Title */}
+          <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+            {product.name}
+          </h3>
+
+          {/* Description */}
+          <p className="text-xs text-gray-600 mb-2 line-clamp-2 flex-grow">
+            {product.description}
+          </p>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {product.gender && (
+              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
+                {product.gender}
+              </span>
+            )}
+            {product.season && (
+              <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
+                {product.season}
+              </span>
+            )}
+          </div>
+
+          {/* Price and Add to Cart Button */}
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 mt-auto">
+            <span className="text-lg font-bold text-indigo-600">
+              {formatNumber(product.price)}
+            </span>
+
+            <Button
+              onClick={handleAddToCart}
+              disabled={adding}
+              size="sm"
+              className="gap-1.5 whitespace-nowrap"
+              aria-label="Add to cart"
+            >
+              <ShoppingCart className="h-3.5 w-3.5" />
+              {adding ? 'Adding...' : 'Add to Cart'}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
 }

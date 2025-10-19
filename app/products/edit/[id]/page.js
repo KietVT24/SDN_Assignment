@@ -17,7 +17,7 @@ export default async function EditProductPage({ params }) {
     <div className="container mx-auto px-4 py-8">
       {/* Back Button */}
       <Button asChild variant="ghost" className="mb-6">
-        <Link href={`/products/${product._id}`}>
+        <Link href={`/products/${product._id}`} className="inline-flex items-center">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Product
         </Link>
