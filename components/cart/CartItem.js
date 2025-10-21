@@ -51,7 +51,7 @@ export default function CartItem({ item, onUpdateQuantity, onRemove, isUpdating 
           {product.name}
         </h3>
         <p className="text-sm text-gray-600 mb-2">
-          ${price.toFixed(2)} each
+          {price.toLocaleString('vi-VN')}đ / sản phẩm
         </p>
         <div className="flex items-center gap-2 text-xs text-gray-500">
           {product.category && (
@@ -96,7 +96,7 @@ export default function CartItem({ item, onUpdateQuantity, onRemove, isUpdating 
         {/* Subtotal */}
         <div className="text-right mb-2">
           <p className="text-lg font-bold text-gray-900">
-            ${subtotal.toFixed(2)}
+            {subtotal.toLocaleString('vi-VN')}đ
           </p>
         </div>
 
@@ -109,7 +109,7 @@ export default function CartItem({ item, onUpdateQuantity, onRemove, isUpdating 
           className="text-red-600 hover:text-red-700 hover:bg-red-50"
         >
           <Trash2 className="h-4 w-4 mr-1" />
-          Remove
+          Xóa
         </Button>
       </div>
     </div>

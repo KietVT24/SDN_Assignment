@@ -77,7 +77,7 @@ export default async function HomePage({ searchParams }) {
                 <Truck className="h-8 w-8 text-indigo-600" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Free Shipping</h3>
-              <p className="text-sm text-gray-600">On orders over $50</p>
+              <p className="text-sm text-gray-600">On orders over 1,000,000đ</p>
             </div>
 
             <div className="text-center">

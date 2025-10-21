@@ -16,18 +16,19 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
 
   const isOwner = session?.user?.id === product.createdBy;
 
-  const formatNumber = (value, locale = 'en-US') => {
-    if (value == null || value === '') return '0';
+  // ✅ Định dạng số theo chuẩn Việt Nam + thêm "đ"
+  const formatCurrency = (value) => {
+    if (value == null || value === '') return '0đ';
     const num = typeof value === 'string' ? parseFloat(value) : value;
-    if (Number.isNaN(num)) return '0';
-    return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(num);
+    if (Number.isNaN(num)) return '0đ';
+    return `${num.toLocaleString('vi-VN')}đ`;
   };
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
 
     if (!session) {
-      toast.error('Please login to add items to cart');
+      toast.error('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng');
       router.push('/auth/login?callbackUrl=/products');
       return;
     }
@@ -46,13 +47,13 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
       const data = await res.json();
 
       if (data.success) {
-        toast.success('Added to cart!');
+        toast.success('Đã thêm vào giỏ hàng!');
       } else {
-        toast.error(data.error || 'Failed to add to cart');
+        toast.error(data.error || 'Không thể thêm vào giỏ hàng');
       }
     } catch (error) {
-      console.error('Add to cart error:', error);
-      toast.error('Failed to add to cart');
+      console.error('Lỗi thêm vào giỏ hàng:', error);
+      toast.error('Thêm sản phẩm thất bại');
     } finally {
       setAdding(false);
     }
@@ -65,17 +66,17 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
     }
   };
 
-  // List View
+  // ================= LIST VIEW =================
   if (viewMode === 'list') {
     return (
       <Link href={`/products/${product._id}`}>
         <div className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 flex">
-          {/* Product Image */}
+          {/* Ảnh sản phẩm */}
           <div className="relative w-48 h-48 flex-shrink-0 bg-gray-100">
             {product.image ? (
               <Image
                 src={product.image}
-                alt={product.name || 'Product image'}
+                alt={product.name || 'Ảnh sản phẩm'}
                 fill
                 className="object-contain"
               />
@@ -88,7 +89,7 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
             )}
           </div>
 
-          {/* Product Info */}
+          {/* Thông tin sản phẩm */}
           <div className="flex-1 p-6 flex flex-col justify-between">
             <div>
               <div className="flex items-start justify-between mb-2">
@@ -96,7 +97,7 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
                   {product.name}
                 </h3>
                 <span className="text-2xl font-bold text-indigo-600">
-                  {formatNumber(product.price)}
+                  {formatCurrency(product.price)}
                 </span>
               </div>
 
@@ -124,16 +125,16 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
               </div>
             </div>
 
-            {/* Actions */}
+            {/* Nút thao tác */}
             <div className="flex gap-2">
               <Button
                 onClick={handleAddToCart}
                 disabled={adding}
                 className="flex-1"
-                aria-label="Add to cart"
+                aria-label="Add to Cart"
               >
                 <ShoppingCart className="h-4 w-4 mr-2" />
-                {adding ? 'Adding...' : 'Add to Cart'}
+                {adding ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
               </Button>
 
               {session && isOwner && (
@@ -147,7 +148,7 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
                     variant="outline"
                     onClick={handleDelete}
                     className="text-red-600 hover:bg-red-50"
-                    aria-label="Delete product"
+                    aria-label="Xóa sản phẩm"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -160,16 +161,16 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
     );
   }
 
-  // Grid View (default) - Optimized for compact cards
+  // ================= GRID VIEW (default) =================
   return (
     <Link href={`/products/${product._id}`}>
       <div className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300 h-full flex flex-col">
-        {/* Product Image Container */}
+        {/* Ảnh sản phẩm */}
         <div className="relative w-full aspect-square bg-gray-100 overflow-hidden flex-shrink-0">
           {product.image ? (
             <Image
               src={product.image}
-              alt={product.name || 'Product image'}
+              alt={product.name || 'Ảnh sản phẩm'}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -182,7 +183,7 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
             </div>
           )}
 
-          {/* Top Action Buttons */}
+          {/* Nút chỉnh sửa/xóa */}
           {session && isOwner && (
             <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
               <Link href={`/products/edit/${product._id}`} onClick={(e) => e.stopPropagation()}>
@@ -190,7 +191,7 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
                   variant="secondary"
                   size="sm"
                   className="bg-white shadow-md hover:bg-gray-50 rounded-md"
-                  aria-label="Edit product"
+                  aria-label="Chỉnh sửa sản phẩm"
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
@@ -200,7 +201,7 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
                 size="sm"
                 onClick={handleDelete}
                 className="bg-white shadow-md hover:bg-red-50 hover:text-red-600 rounded-md"
-                aria-label="Delete product"
+                aria-label="Xóa sản phẩm"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -208,19 +209,16 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
           )}
         </div>
 
-        {/* Product Info */}
+        {/* Thông tin sản phẩm */}
         <div className="p-3 flex-1 flex flex-col">
-          {/* Title */}
           <h3 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-1 group-hover:text-indigo-600 transition-colors">
             {product.name}
           </h3>
 
-          {/* Description */}
           <p className="text-xs text-gray-600 mb-2 line-clamp-2 flex-grow">
             {product.description}
           </p>
 
-          {/* Tags */}
           <div className="flex flex-wrap gap-1.5 mb-3">
             {product.gender && (
               <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
@@ -234,10 +232,10 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
             )}
           </div>
 
-          {/* Price and Add to Cart Button */}
+          {/* Giá + nút thêm */}
           <div className="flex items-center justify-between gap-2 pt-2 border-t border-gray-100 mt-auto">
             <span className="text-lg font-bold text-indigo-600">
-              {formatNumber(product.price)}
+              {formatCurrency(product.price)}
             </span>
 
             <Button
@@ -245,10 +243,10 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
               disabled={adding}
               size="sm"
               className="gap-1.5 whitespace-nowrap"
-              aria-label="Add to cart"
+              aria-label="Thêm vào giỏ hàng"
             >
               <ShoppingCart className="h-3.5 w-3.5" />
-              {adding ? 'Adding...' : 'Add to Cart'}
+              {adding ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
             </Button>
           </div>
         </div>
