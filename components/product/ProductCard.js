@@ -243,7 +243,7 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
               disabled={adding}
               size="sm"
               className="gap-1.5 whitespace-nowrap"
-              aria-label="Thêm vào giỏ hàng"
+              aria-label="Add to Cart"
             >
               <ShoppingCart className="h-3.5 w-3.5" />
               {adding ? 'Đang thêm...' : 'Add to cart'}
