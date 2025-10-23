@@ -104,7 +104,7 @@ export default function PaymentSuccessClient() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Total Amount</p>
-                      <p className="text-2xl font-bold text-green-600">${order.totalAmount.toFixed(2)}</p>
+                      <p className="text-2xl font-bold text-green-600">{order.totalAmount.toLocaleString('vi-VN')}đ</p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Payment Method</p>
@@ -155,7 +155,7 @@ export default function PaymentSuccessClient() {
                         <span className="text-gray-700">
                           {item.name} × {item.quantity}
                         </span>
-                        <span className="font-medium text-gray-900">${(item.price * item.quantity).toFixed(2)}</span>
+                        <span className="font-medium text-gray-900">{(item.price * item.quantity).toLocaleString('vi-VN')}đ</span>
                       </div>
                     ))}
                     {order.items.length > 3 && (

@@ -159,7 +159,7 @@ export default async function HomePage({ searchParams }) {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 mb-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
                 {products.map((product) => (
                   // ProductCard loaded client-side for interactive cards; if you prefer server rendering, replace with server markup.
                   <ProductCard key={product._id ?? product.id ?? product.slug} product={product} />

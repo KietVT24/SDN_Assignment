@@ -289,10 +289,10 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{item.product.name}</p>
-                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                        <p className="text-sm text-gray-500">SL: {item.quantity}</p>
                       </div>
                       <p className="font-semibold text-gray-900">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        {(item.price * item.quantity).toLocaleString('vi-VN')}đ
                       </p>
                     </div>
                   ))}

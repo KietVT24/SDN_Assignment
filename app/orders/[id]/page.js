@@ -96,6 +96,10 @@ export default function OrderDetailPage({ params }) {
 
   const statusInfo = statusConfig[order.status] || statusConfig.pending;
   const StatusIcon = statusInfo.icon;
+  const subtotal = order.totalAmount;
+  const shipping = subtotal > 0 ? 10000 : 0; // Logic từ CartSummary
+  const tax = subtotal * 0.1; // Logic từ CartSummary
+  const total = subtotal + shipping + tax;
   const orderDate = new Date(order.createdAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -181,13 +185,13 @@ export default function OrderDetailPage({ params }) {
                         {item.name}
                       </h3>
                       <p className="text-sm text-gray-600">
-                        ${item.price.toFixed(2)} × {item.quantity}
+                        {item.price.toLocaleString('vi-VN')}đ × {item.quantity}
                       </p>
                     </div>
                     
                     <div className="text-right">
                       <p className="font-bold text-gray-900">
-                        ${(item.price * item.quantity).toFixed(2)}
+                      {(item.price * item.quantity).toLocaleString('vi-VN')}đ
                       </p>
                     </div>
                   </div>
@@ -230,21 +234,21 @@ export default function OrderDetailPage({ params }) {
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span>${order.totalAmount.toFixed(2)}</span>
+                  <span>{subtotal.toLocaleString('vi-VN')}đ</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  <span>$10.00</span>
+                  <span>{shipping.toLocaleString('vi-VN')}đ</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Tax</span>
-                  <span>${(order.totalAmount * 0.1).toFixed(2)}</span>
+                  <span>{tax.toLocaleString('vi-VN')}đ</span>
                 </div>
                 <div className="border-t pt-3">
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-gray-900">Total</span>
                     <span className="text-2xl font-bold text-indigo-600">
-                      ${(order.totalAmount + 10 + order.totalAmount * 0.1).toFixed(2)}
+                    {total.toLocaleString('vi-VN')}đ
                     </span>
                   </div>
                 </div>

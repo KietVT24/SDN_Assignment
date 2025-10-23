@@ -42,7 +42,7 @@ export default function OrderItem({ order }) {
   const status = statusConfig[order.status] || statusConfig.pending;
   const StatusIcon = status.icon;
   
-  const orderDate = new Date(order.createdAt).toLocaleDateString('en-US', {
+  const orderDate = new Date(order.createdAt).toLocaleDateString('vi-VN', {
     year: 'numeric',
     month: 'short',
     day: 'numeric'
@@ -75,7 +75,7 @@ export default function OrderItem({ order }) {
               {status.label}
             </span>
             <span className="text-lg font-bold text-gray-900">
-              ${order.totalAmount.toFixed(2)}
+            {order.totalAmount.toLocaleString('vi-VN')}đ
             </span>
           </div>
         </div>
@@ -105,11 +105,11 @@ export default function OrderItem({ order }) {
                   {item.name}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Qty: {item.quantity} × ${item.price.toFixed(2)}
+                  SL: {item.quantity} × {item.price.toLocaleString('vi-VN')}đ
                 </p>
               </div>
               <p className="font-semibold text-gray-900">
-                ${(item.price * item.quantity).toFixed(2)}
+                {(item.price * item.quantity).toLocaleString('vi-VN')}đ
               </p>
             </div>
           ))}

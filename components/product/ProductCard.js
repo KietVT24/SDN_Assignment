@@ -246,7 +246,7 @@ export default function ProductCard({ product, onDelete, viewMode = 'grid' }) {
               aria-label="Thêm vào giỏ hàng"
             >
               <ShoppingCart className="h-3.5 w-3.5" />
-              {adding ? 'Đang thêm...' : 'Thêm vào giỏ hàng'}
+              {adding ? 'Đang thêm...' : 'Add to cart'}
             </Button>
           </div>
         </div>
